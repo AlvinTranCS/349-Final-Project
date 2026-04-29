@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-background: #323437;
+  --color-untyped: #646669;
+  --color-correct: #d1d0c5;
+  --color-accent: #e2b714;
+  --color-error: #ca4754;
+  --font-mono: "Roboto Mono", monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-untyped);
+    font-family: var(--font-mono);
+    overflow: hidden;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
