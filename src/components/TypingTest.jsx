@@ -3,7 +3,9 @@ import { useRef, useEffect, useState } from 'react';
 export default function TypingTest({ text, input, onInput, onStart, isActive, onKeystroke }) {
   const inputRef = useRef(null);
   const textContainerRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
   const [cursorPos, setCursorPos] = useState({ left: 0, top: 0, height: 0 });
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -51,17 +53,16 @@ export default function TypingTest({ text, input, onInput, onStart, isActive, on
   };
 
   const handleKeyDown = (e) => {
+    // Set solid cursor while typing
+    setIsTyping(true);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 1000);
+
     if (e.key === 'Backspace') {
-      // Prevent backspacing if we are at the start of a word (previous char was space)
-      if (input.length > 0 && input[input.length - 1] === ' ') {
-        e.preventDefault();
-        return;
-      }
-      
-      // If valid backspace, count it as an incorrect keystroke
-      if (input.length > 0) {
-        onKeystroke({ isCorrect: false });
-      }
       return;
     }
 
@@ -118,7 +119,7 @@ export default function TypingTest({ text, input, onInput, onStart, isActive, on
         autoFocus
       />
       <div 
-        className="absolute w-[2px] bg-accent transition-all duration-100 ease-out z-10 animate-pulse"
+        className={`absolute w-[2px] bg-accent transition-all duration-100 ease-out z-10 ${isTyping ? '' : 'animate-pulse'}`}
         style={{ 
           left: cursorPos.left, 
           top: cursorPos.top + (cursorPos.height * 0.1),

@@ -25,7 +25,7 @@ const generateGibberish = (count) => {
   const letters = "abcdefghijklmnopqrstuvwxyz";
   const words = [];
   for (let i = 0; i < count; i++) {
-    const length = Math.floor(Math.random() * 7) + 2; // lengths 2 to 8
+    const length = Math.floor(Math.random() * 5) + 1; // lengths 1 to 5
     let word = "";
     for (let j = 0; j < length; j++) {
       word += letters[Math.floor(Math.random() * letters.length)];

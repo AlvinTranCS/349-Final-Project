@@ -14,6 +14,8 @@ export default function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [totalKeystrokes, setTotalKeystrokes] = useState(0);
   const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
   useEffect(() => {
     setText(generateWords(200, mode));
@@ -37,6 +39,8 @@ export default function App() {
         setShowHelp(false);
         setTotalKeystrokes(0);
         setCorrectKeystrokes(0);
+        setStartTime(null);
+        setEndTime(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -45,10 +49,14 @@ export default function App() {
 
   const handleStart = () => {
     setStatus('running');
+    setStartTime(Date.now());
   };
 
   const handleInput = (val) => {
     setInput(val);
+    if (val.length === text.length) {
+      handleTimeUp();
+    }
   };
 
   const handleKeystroke = ({ isCorrect }) => {
@@ -60,6 +68,7 @@ export default function App() {
 
   const handleTimeUp = () => {
     setStatus('finished');
+    setEndTime(Date.now());
   };
 
   const handleRestart = () => {
@@ -69,6 +78,8 @@ export default function App() {
     setTimeRemaining(selectedTime);
     setTotalKeystrokes(0);
     setCorrectKeystrokes(0);
+    setStartTime(null);
+    setEndTime(null);
   };
 
   const handleModeSelect = (newMode) => {
@@ -78,6 +89,8 @@ export default function App() {
     setTimeRemaining(selectedTime);
     setTotalKeystrokes(0);
     setCorrectKeystrokes(0);
+    setStartTime(null);
+    setEndTime(null);
   };
 
   const handleTimeSelect = (time) => {
@@ -88,6 +101,8 @@ export default function App() {
       setInput('');
       setTotalKeystrokes(0);
       setCorrectKeystrokes(0);
+      setStartTime(null);
+      setEndTime(null);
     }
   };
 
@@ -95,7 +110,8 @@ export default function App() {
   let accuracy = 100;
 
   if (status === 'finished') {
-    const minutes = selectedTime / 60;
+    const timeElapsedSecs = endTime && startTime ? (endTime - startTime) / 1000 : selectedTime;
+    const minutes = Math.max(timeElapsedSecs / 60, 0.01); // Prevent division by zero
     wpm = (totalKeystrokes / 5) / minutes;
     accuracy = totalKeystrokes > 0 ? (correctKeystrokes / totalKeystrokes) * 100 : 0;
   }
