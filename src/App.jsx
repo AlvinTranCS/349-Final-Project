@@ -32,15 +32,11 @@ export default function App() {
       }
       if (e.key === 'Escape') {
         e.preventDefault();
-        setStatus('idle');
-        setText(generateWords(200, mode));
-        setInput('');
-        setTimeRemaining(selectedTime);
-        setShowHelp(false);
-        setTotalKeystrokes(0);
-        setCorrectKeystrokes(0);
-        setStartTime(null);
-        setEndTime(null);
+        if (status === 'running') {
+          setStatus('paused');
+        } else if (status === 'paused') {
+          setStatus('running');
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -172,13 +168,19 @@ export default function App() {
         {status === 'finished' ? (
           <Dashboard wpm={wpm} accuracy={accuracy} onRestart={handleRestart} />
         ) : (
-          <div className="mt-8 transition-opacity duration-300">
+          <div className="mt-8 transition-opacity duration-300 relative">
+            {status === 'paused' && (
+              <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-20 backdrop-blur-sm rounded">
+                <span className="text-3xl font-bold text-accent animate-pulse">paused</span>
+              </div>
+            )}
             <TypingTest
               text={text}
               input={input}
               onInput={handleInput}
               onStart={handleStart}
               isActive={status === 'running'}
+              isPaused={status === 'paused'}
               onKeystroke={handleKeystroke}
             />
           </div>
@@ -215,7 +217,7 @@ export default function App() {
                 <span className="bg-untyped/20 px-2 py-1 rounded text-correct font-bold text-sm">tab</span>
               </li>
               <li className="flex justify-between items-center">
-                <span>reset / pause</span>
+                <span>pause / resume</span>
                 <span className="bg-untyped/20 px-2 py-1 rounded text-correct font-bold text-sm">esc</span>
               </li>
             </ul>

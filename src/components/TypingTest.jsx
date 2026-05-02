@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-export default function TypingTest({ text, input, onInput, onStart, isActive, onKeystroke }) {
+export default function TypingTest({ text, input, onInput, onStart, isActive, isPaused, onKeystroke }) {
   const inputRef = useRef(null);
   const textContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -43,6 +43,7 @@ export default function TypingTest({ text, input, onInput, onStart, isActive, on
   }, [input, text]);
 
   const handleChange = (e) => {
+    if (isPaused) return;
     const value = e.target.value;
     if (!isActive && value.length === 1) {
       onStart();
@@ -53,6 +54,10 @@ export default function TypingTest({ text, input, onInput, onStart, isActive, on
   };
 
   const handleKeyDown = (e) => {
+    if (isPaused) {
+      e.preventDefault();
+      return;
+    }
     // Set solid cursor while typing
     setIsTyping(true);
     if (typingTimeoutRef.current) {
