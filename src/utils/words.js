@@ -21,7 +21,25 @@ export const commonWords = [
   "again", "animal", "point", "mother", "world", "near", "build", "self", "earth", "father"
 ];
 
-export const generateWords = (count = 100) => {
+const generateGibberish = (count) => {
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const words = [];
+  for (let i = 0; i < count; i++) {
+    const length = Math.floor(Math.random() * 7) + 2; // lengths 2 to 8
+    let word = "";
+    for (let j = 0; j < length; j++) {
+      word += letters[Math.floor(Math.random() * letters.length)];
+    }
+    words.push(word);
+  }
+  return words.join(" ");
+};
+
+export const generateWords = (count = 100, mode = 'words') => {
+  if (mode === 'random') {
+    return generateGibberish(count);
+  }
+  
   const words = [];
   for (let i = 0; i < count; i++) {
     const randomIndex = Math.floor(Math.random() * commonWords.length);

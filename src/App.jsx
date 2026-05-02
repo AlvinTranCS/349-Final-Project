@@ -10,11 +10,14 @@ export default function App() {
   const [status, setStatus] = useState('idle'); // idle, running, finished
   const [timeRemaining, setTimeRemaining] = useState(30);
   const [selectedTime, setSelectedTime] = useState(30);
+  const [mode, setMode] = useState('words');
   const [showHelp, setShowHelp] = useState(false);
+  const [totalKeystrokes, setTotalKeystrokes] = useState(0);
+  const [correctKeystrokes, setCorrectKeystrokes] = useState(0);
 
   useEffect(() => {
-    setText(generateWords(200));
-  }, []);
+    setText(generateWords(200, mode));
+  }, [mode]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -28,15 +31,17 @@ export default function App() {
       if (e.key === 'Escape') {
         e.preventDefault();
         setStatus('idle');
-        setText(generateWords(200));
+        setText(generateWords(200, mode));
         setInput('');
         setTimeRemaining(selectedTime);
         setShowHelp(false);
+        setTotalKeystrokes(0);
+        setCorrectKeystrokes(0);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedTime, status]);
+  }, [selectedTime, status, mode]);
 
   const handleStart = () => {
     setStatus('running');
@@ -46,22 +51,43 @@ export default function App() {
     setInput(val);
   };
 
+  const handleKeystroke = ({ isCorrect }) => {
+    setTotalKeystrokes((prev) => prev + 1);
+    if (isCorrect) {
+      setCorrectKeystrokes((prev) => prev + 1);
+    }
+  };
+
   const handleTimeUp = () => {
     setStatus('finished');
   };
 
   const handleRestart = () => {
-    setText(generateWords(200));
+    setText(generateWords(200, mode));
     setInput('');
     setStatus('idle');
     setTimeRemaining(selectedTime);
+    setTotalKeystrokes(0);
+    setCorrectKeystrokes(0);
+  };
+
+  const handleModeSelect = (newMode) => {
+    setMode(newMode);
+    setStatus('idle');
+    setInput('');
+    setTimeRemaining(selectedTime);
+    setTotalKeystrokes(0);
+    setCorrectKeystrokes(0);
   };
 
   const handleTimeSelect = (time) => {
     setSelectedTime(time);
     setTimeRemaining(time);
     if (status !== 'idle') {
-      handleRestart();
+      setStatus('idle');
+      setInput('');
+      setTotalKeystrokes(0);
+      setCorrectKeystrokes(0);
     }
   };
 
@@ -69,15 +95,9 @@ export default function App() {
   let accuracy = 100;
 
   if (status === 'finished') {
-    let correctChars = 0;
-    for (let i = 0; i < input.length; i++) {
-      if (input[i] === text[i]) {
-        correctChars++;
-      }
-    }
     const minutes = selectedTime / 60;
-    wpm = (correctChars / 5) / minutes;
-    accuracy = input.length > 0 ? (correctChars / input.length) * 100 : 0;
+    wpm = (totalKeystrokes / 5) / minutes;
+    accuracy = totalKeystrokes > 0 ? (correctKeystrokes / totalKeystrokes) * 100 : 0;
   }
 
   return (
@@ -85,16 +105,31 @@ export default function App() {
       <div className="w-full max-w-5xl mb-8 flex justify-between items-center text-untyped">
         <h1 className="text-3xl font-bold text-correct">typeflow</h1>
         {status !== 'finished' && (
-          <div className="flex space-x-4">
-            {[15, 30, 60].map((t) => (
-              <button
-                key={t}
-                onClick={() => handleTimeSelect(t)}
-                className={`hover:text-correct transition-colors ${selectedTime === t ? 'text-accent' : ''}`}
-              >
-                {t}s
-              </button>
-            ))}
+          <div className="flex items-center">
+            <div className="flex space-x-4 border-r border-untyped/30 pr-4 mr-4">
+              {['words', 'random'].map((m) => (
+                <button
+                  key={m}
+                  onClick={() => handleModeSelect(m)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  className={`hover:text-correct transition-colors ${mode === m ? 'text-accent' : ''}`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+            <div className="flex space-x-4">
+              {[15, 30, 60].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => handleTimeSelect(t)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  className={`hover:text-correct transition-colors ${selectedTime === t ? 'text-accent' : ''}`}
+                >
+                  {t}s
+                </button>
+              ))}
+            </div>
             <button
               onClick={() => setShowHelp(true)}
               className="hover:text-correct transition-colors ml-4 focus:outline-none"
@@ -128,6 +163,7 @@ export default function App() {
               onInput={handleInput}
               onStart={handleStart}
               isActive={status === 'running'}
+              onKeystroke={handleKeystroke}
             />
           </div>
         )}
