@@ -1,12 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg: #f8f9fa;
+  --untyped: #adb5bd;
+  --correct: #212529;
+  --accent: #2563eb;
+  --error: #dc2626;
+}
+
+.dark {
+  --bg: #323437;
+  --untyped: #646669;
+  --correct: #d1d0c5;
+  --accent: #e2b714;
+  --error: #ca4754;
+}
+
 @theme {
-  --color-background: #323437;
-  --color-untyped: #646669;
-  --color-correct: #d1d0c5;
-  --color-accent: #e2b714;
-  --color-error: #ca4754;
+  --color-background: var(--bg);
+  --color-untyped: var(--untyped);
+  --color-correct: var(--correct);
+  --color-accent: var(--accent);
+  --color-error: var(--error);
   --font-mono: "Roboto Mono", monospace;
 }
 
@@ -18,5 +34,6 @@
     overflow: hidden;
     margin: 0;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
