@@ -31,7 +31,6 @@
     background-color: var(--color-background);
     color: var(--color-untyped);
     font-family: var(--font-mono);
-    overflow: hidden;
     margin: 0;
     min-height: 100vh;
     transition: background-color 0.3s ease, color 0.3s ease;
